@@ -12,7 +12,8 @@ private:
     {
         Unknown,
         Pose,
-        SetPulse
+        SetPulse,
+        Movement
     };
 
 public:

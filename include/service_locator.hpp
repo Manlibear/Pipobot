@@ -21,7 +21,7 @@ public:
 
         if (existing == nullptr)
         {
-            instances.emplace(type_id<T>, std::shared_ptr<void>(instance));
+            instances.emplace(type_id<T>(), std::shared_ptr<void>(instance));
             return Resolve<T>();
         }
 
@@ -31,7 +31,7 @@ public:
     template <typename T>
     static std::shared_ptr<T> Resolve()
     {
-        auto itr1 = instances.find(type_id<T>);
+        auto itr1 = instances.find(type_id<T>());
         if (itr1 != instances.end())
             return std::static_pointer_cast<T>(itr1->second);
 

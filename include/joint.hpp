@@ -1,9 +1,11 @@
 #pragma once
 
 #pragma once
-#include <Servo.h>
+#include "../lib/servo2040/servo2040.hpp"
 #include <ArduinoJson.h>
 #include <vector>
+#include <memory>
+using namespace servo;
 
 struct Joint
 {
@@ -14,6 +16,7 @@ struct Joint
     Servo *ConnectedServo;
     int GPIOAddr;
     bool Inverted = false;
+    char Key;
     // ServoEaser Easer;
 
     bool operator()(const Joint &other) const
@@ -39,6 +42,54 @@ namespace ARDUINOJSON_NAMESPACE
                 result.push_back(j);
             }
 
+            return result;
+        }
+    };
+
+    template <>
+    struct Converter<std::vector<std::pair<int, std::vector<Joint>>>>
+    {
+        static std::vector<std::pair<int, std::vector<Joint>>> fromJson(VariantConstRef src)
+        {
+            std::vector<std::pair<int, std::vector<Joint>>> result;
+
+            for (auto json : src.as<JsonArrayConst>())
+            {
+                int length = json["Length"].as<int>();
+                auto joints = json["Joints"].as<std::vector<Joint>>();
+                result.push_back(std::make_pair(length, joints));
+            }
+            return result;
+        }
+    };
+
+    template <>
+    struct Converter<std::vector<std::pair<int, std::string>>>
+    {
+        static std::vector<std::pair<int, std::string>> fromJson(VariantConstRef src)
+        {
+            std::vector<std::pair<int, std::string>> result;
+            for (auto json : src.as<JsonArrayConst>())
+            {
+                int length = json["Length"].as<int>();
+                std::string joints = json["Joints"].as<std::string>();
+                result.push_back(std::make_pair(length, joints));
+            }
+            return result;
+        }
+    };
+
+    template <>
+    struct Converter<std::vector<std::string>>
+    {
+        static std::vector<std::string> fromJson(VariantConstRef src)
+        {
+            std::vector<std::string> result;
+            for (auto json : src.as<JsonArrayConst>())
+            {
+                std::string s = json.as<std::string>();
+                result.push_back(s);
+            }
             return result;
         }
     };

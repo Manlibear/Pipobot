@@ -1,7 +1,8 @@
 #pragma once
 #include "robot.hpp"
-#include "joint.hpp"
 #include <vector>
+#include <memory>
+using namespace servo;
 
 class Catbot : public IRobot
 {
@@ -11,31 +12,34 @@ public:
     void Process(float deltaTime);
     void SetPulse(std::string joint, int target);
     void StopMovement();
+    void SetMovement(std::vector<std::pair<int, std::vector<Joint>>> frames);
+    std::string JointNameFromKey(char key);
 
 private:
-    Servo f_r_hip;
-    Servo f_l_hip;
-    Servo f_r_knee;
-    Servo f_l_knee;
-    Servo r_r_hip;
-    Servo r_l_hip;
-    Servo r_r_knee;
-    Servo r_l_knee;
+    std::unique_ptr<Servo> f_r_hip;
+    std::unique_ptr<Servo> f_l_hip;
+    std::unique_ptr<Servo> f_r_knee;
+    std::unique_ptr<Servo> f_l_knee;
+    std::unique_ptr<Servo> r_r_hip;
+    std::unique_ptr<Servo> r_l_hip;
+    std::unique_ptr<Servo> r_r_knee;
+    std::unique_ptr<Servo> r_l_knee;
 
-    const float MovementTime = 2000;
+    const float MovementTime = 1000;
     float ElapsedTime = 0;
 
     std::vector<Joint> joints = {
-        {"FrontRightHip", 0, 0, 0, &f_r_hip, 0, true},
-        {"FrontRightKnee", 180, 0, 0, &f_r_knee, 1, true},
-
-        {"FrontLeftHip", 0, 0, 0, &f_l_hip, 2},
-        {"FrontLeftKnee", 180, 0, 0, &f_l_knee, 3},
-
-        {"RearRightHip", 140, 0, 0, &r_r_hip, 12, true},
-        {"RearRightKnee", 90, 0, 0, &r_r_knee, 13, true},
-
-        {"RearLeftHip", 140, 0, 0, &r_l_hip, 14},
-        {"RearLeftKnee", 90, 0, 0, &r_l_knee, 15},
+        {"FrontRightHip", 0, 0, 0, nullptr, 0, true, 'A'},
+        {"FrontRightKnee", 180, 0, 0, nullptr, 1, true, 'B'},
+        {"FrontLeftHip", 0, 0, 0, nullptr, 2, false, 'C'},
+        {"FrontLeftKnee", 180, 0, 0, nullptr, 3, false, 'D'},
+        {"RearRightHip", 140, 0, 0, nullptr, 4, true, 'E'},
+        {"RearRightKnee", 90, 0, 0, nullptr, 5, true, 'F'},
+        {"RearLeftHip", 140, 0, 0, nullptr, 6, true, 'G'},
+        {"RearLeftKnee", 90, 0, 0, nullptr, 7, true, 'H'},
     };
+
+    std::vector<std::pair<int, std::vector<Joint>>> keyframes;
+
+    void NextFrame();
 };
